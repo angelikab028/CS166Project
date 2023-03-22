@@ -1,3 +1,5 @@
+--this file is for writing the sqls to be implemented in java
+
 --public static void viewHotels(Hotel esql) {}
 SELECT h.hotelName
 FROM Hotel h
@@ -35,22 +37,44 @@ WHERE rb.customerID = --customer id (user input)
       AND rb.hotelID = r.hotelID
       AND rb.roomNumber = r.roomNumber
 ORDER BY rb.bookingID DESC
-LIMIT 5
+LIMIT 5;
 
 --public static void updateRoomInfo(Hotel esql) {}
-
+-- verify if manager first 
 
 --public static void viewRecentUpdates(Hotel esql) {}
-
+-- verify if manager first
+SELECT *
+FROM RoomUpdatesLog ru
+WHERE hotelID = --user input
+      AND managerID = --managerID (user input)
+ORDER BY updateNumber DESC
+LIMIT 5;
 
 --public static void viewBookingHistoryofHotel(Hotel esql) {}
-
+-- verify if manager first
+SELECT rb.bookingID, u.name, rb.hotelID, rb.roomNumber, rb.bookingDate
+FROM RoomBookings rb, Users u
+WHERE rb.hotelID = (SELECT h.hotelID
+                 FROM Hotel h
+                 WHERE managerUserID = --managerUserID (user input))
+      AND u.userID = rb.customerID;
 
 --public static void viewRegularCustomers(Hotel esql) {}
-
+-- verify if manager first
+SELECT rb.customerID, u.name, COUNT(*) as numOfBookings
+FROM RoomBookings rb, Hotel h, User u
+WHERE rb.hotelID = --user input
+      AND h.hotelID = rb.hotelID
+      AND h.managerUserID = --managerid user input
+      AND u.userID = customerID
+GROUP BY rb.customerID
+ORDER BY numOfBookings DESC
+LIMIT 5
 
 --public static void placeRoomRepairRequests(Hotel esql) {}
-
+-- verify if manager first
 
 --public static void viewRoomRepairHistory(Hotel esql) {}
+-- verify if manager first
 
