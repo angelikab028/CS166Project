@@ -634,13 +634,23 @@ public class Hotel {
             }
          
          if(man){
+            System.out.print("\tEnter the dates in the format of \'YYYY-MM-DD\' \n");
+            System.out.print("\tEnter earliest date (lower boundry): ");
+            String userLower = in.readLine();
+            System.out.print("\tEnter most recent date (upper boundry): ");
+            String userUpper = in.readLine();
+
             query = "SELECT rb.bookingID, u.name, rb.hotelID, rb.roomNumber, rb.bookingDate " +
                  "FROM RoomBookings rb, Users u " +
                  "WHERE rb.hotelID IN (SELECT h.hotelID " +
                                       "FROM Hotel h " +
                                       "WHERE managerUserID = " + authorisedUser + ") " +
                  "AND u.userID = rb.customerID " +
+                 "AND rb.bookingDate >= \'" + userLower + "\' " +
+                 "AND rb.bookingDate <= \'" + userUpper + "\' " +
                  "ORDER BY rb.hotelID";
+            
+            System.out.print("\nbookingID, userName,                              hotelID, roomNumber, bookngDate \n");
             List<List<String>> result1 = esql.executeQueryAndReturnResult(query);
             for (List<String> innerResult : result1){ 
                System.out.println(innerResult);

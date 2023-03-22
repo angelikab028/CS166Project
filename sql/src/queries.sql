@@ -67,6 +67,8 @@ WHERE rb.hotelID IN (SELECT h.hotelID
                  FROM Hotel h
                  WHERE managerUserID = --managerUserID (user input))
       AND u.userID = rb.customerID
+      AND rb.bookingDate >= -- user data lower
+      AND rb.bookingDate <= --user data upper
 ORDER BY rb.hotelID;
 
 --public static void viewRegularCustomers(Hotel esql) {}
