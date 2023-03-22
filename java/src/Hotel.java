@@ -533,8 +533,6 @@ public class Hotel {
                         "FROM Users " +
                         "WHERE userID = " + authorisedUser + ";"; 
 
-         esql.executeQueryAndPrintResult(query);
-
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
             boolean man = false;
             String managerStr = "manager   ";
@@ -581,8 +579,6 @@ public class Hotel {
                         "FROM Users " +
                         "WHERE userID = " + authorisedUser + ";"; 
 
-         esql.executeQueryAndPrintResult(query);
-
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
             boolean man = false;
             String managerStr = "manager   ";
@@ -622,8 +618,6 @@ public class Hotel {
                         "FROM Users " +
                         "WHERE userID = " + authorisedUser + ";"; 
 
-         esql.executeQueryAndPrintResult(query);
-
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
             boolean man = false;
             String managerStr = "manager   ";
@@ -662,8 +656,6 @@ public class Hotel {
          String query = "SELECT usertype " +
                         "FROM Users " +
                         "WHERE userID = " + authorisedUser + ";"; 
-
-         esql.executeQueryAndPrintResult(query);
 
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
             boolean man = false;
@@ -707,8 +699,6 @@ public class Hotel {
          String query = "SELECT usertype " +
                         "FROM Users " +
                         "WHERE userID = " + authorisedUser + ";"; 
-
-         esql.executeQueryAndPrintResult(query);
 
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
             boolean man = false;
@@ -777,8 +767,6 @@ public class Hotel {
          String query = "SELECT usertype " +
                         "FROM Users " +
                         "WHERE userID = " + authorisedUser + ";"; 
-
-         esql.executeQueryAndPrintResult(query);
 
          List<List<String>> result = esql.executeQueryAndReturnResult(query);
             boolean man = false;
