@@ -32,6 +32,8 @@ import java.lang.Math;
  */
 public class Hotel {
 
+   public static String authorisedUser = null;
+
    // reference to physical database connection.
    private Connection _connection = null;
 
@@ -269,7 +271,6 @@ public class Hotel {
             System.out.println("1. Create user");
             System.out.println("2. Log in");
             System.out.println("9. < EXIT");
-            String authorisedUser = null;
             switch (readChoice()){
                case 1: CreateUser(esql); break;
                case 2: authorisedUser = LogIn(esql); break;
@@ -307,7 +308,9 @@ public class Hotel {
                    case 8: viewRegularCustomers(esql); break;
                    case 9: placeRoomRepairRequests(esql); break;
                    case 10: viewRoomRepairHistory(esql); break;
-                   case 20: usermenu = false; break;
+                   case 20: usermenu = false; 
+                            authorisedUser = null; 
+                            break;
                    default : System.out.println("Unrecognized choice!"); break;
                 }
               }
@@ -410,51 +413,401 @@ public class Hotel {
 
    public static void viewHotels(Hotel esql) //Allows the user to see the list of hotels within 30 units distance of the user’s given input location 
    {
-      try
-      {
-         String query = 
-      }
+      try{
+         System.out.print("\tEnter longitude: ");
+         String longitude = in.readLine();
+         System.out.print("\tEnter latitude: ");
+         String latitude = in.readLine();
 
-   }
+         String query = "SELECT h.hotelName " +
+                        "From Hotel h " +
+                        "WHERE calculate_distance( h.latitude, h.longitude, " + longitude + ", " + latitude + ") < 30.0";
+
+         esql.executeQueryAndPrintResult(query);           
+         int rowCount = esql.executeQuery(query);
+         System.out.println("total row(s):" + rowCount);
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+         //return null;
+      }  
+   } //end viewHotels;
+
    public static void viewRooms(Hotel esql) 
    {
       try 
       {
-         String query = 
+         System.out.print("\tEnter hotel ID: ");
+         String hotelID = in.readLine();
+         System.out.print("\tEnter booking date: ");
+         String bookingDate = in.readLine();
+         
+         String query = "SELECT r.roomNumber, r.price " +
+                        "FROM Rooms r " + 
+                        "WHERE NOT EXISTS(SELECT *" +
+                                         "FROM RoomBookings rb " +
+                                         "WHERE rb.hotelID = " + hotelID +
+                                         " AND rb.bookingDate = '" + bookingDate + "'" +
+                                         " AND rb.roomNumber = r.roomNumber) " +
+                        "AND r.hotelID = " + hotelID;
+         
+         esql.executeQueryAndPrintResult(query);
+         int rowCount = esql.executeQuery(query);
+         System.out.println("total row(s): " + rowCount);
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
       }
 
-   }
+   }//end viewRooms
+
    public static void bookRooms(Hotel esql) 
    {
       try 
       {
-         String query = 
+         System.out.print("\tEnter hotel ID: ");
+         String hotelID = in.readLine();
+         System.out.print("\tEnter booking date: ");
+         String bookingDate = in.readLine();
+         System.out.print("\tEnter room number: ");
+         String roomNumber = in.readLine();
 
+         String query = "SELECT rb.roomNumber " +
+                        "FROM RoomBookings rb " +
+                        "WHERE rb.hotelID = " + hotelID +
+                        " AND rb.bookingDate = '" + bookingDate + "'" +
+                        " AND rb.roomNumber = " + roomNumber + ";";
+      
+
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+         
+         boolean booked = false;
+
+         for (List<String> innerResult : result){ 
+            if (innerResult.contains(roomNumber)) {
+               booked = true;
+               break;
+            }
+         }
+
+         if(booked){
+            System.out.println("Cannot book room because room is already booked.");
+         }else{
+            
+            query = "INSERT INTO RoomBookings(customerID, hotelID, roomNumber, bookingDate) " +
+                           "VALUES (" + authorisedUser + ", " + hotelID + ", " + roomNumber + ", \'" + bookingDate + "\')";
+
+            esql.executeUpdate(query);
+
+            System.out.println("Room successfully booked.");
+            //int rowCount = esql.executeQuery(query);
+            //System.out.println("total row(s): " + rowCount);
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
       }
-
-   }
+   } //end bookRooms
+   
    public static void viewRecentBookingsfromCustomer(Hotel esql) 
    {
       try
       {
-         String query = 
-      }
+          String query = "SELECT rb.hotelID, rb.roomNumber, r.price, rb.bookingDate " +
+                         "FROM RoomBookings rb, Rooms r " +
+                         "WHERE rb.customerID = " + authorisedUser +
+                         " AND rb.hotelID = r.hotelID " +
+                         "AND rb.roomNumber = r.roomNumber " +
+                         "ORDER BY rb.bookingDate DESC " +
+                         "LIMIT 5";
 
-   }
+         esql.executeQueryAndPrintResult(query);
+         int rowCount = esql.executeQuery(query);
+         System.out.println("total row(s): " + rowCount);
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }
+   }//end viewRecentBookingsfromCustomer
+   
    public static void updateRoomInfo(Hotel esql) 
    {
+      try{
+         String query = "SELECT usertype " +
+                        "FROM Users " +
+                        "WHERE userID = " + authorisedUser + ";"; 
 
+         esql.executeQueryAndPrintResult(query);
 
-   }
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+            boolean man = false;
+            String managerStr = "manager   ";
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(managerStr)) {
+                  man = true;
+                  break;
+               }
+            }
+         
+         if(man){
+            System.out.print("\tEnter hotel ID: ");
+            String hotelID = in.readLine();
+            System.out.print("\tEnter room number: ");
+            String roomNumber = in.readLine();
+            System.out.print("\tEnter updated price: ");
+            String roomPrice = in.readLine();
+             System.out.print("\tEnter image url: ");
+            String imageUpdate = in.readLine();
+
+            query = "UPDATE Rooms " +
+                  "SET price = " + roomPrice + ", " +
+                      "imageURL = \'" + imageUpdate + "\' " + 
+                  "WHERE roomNumber = " + roomNumber + " " + 
+                        "AND hotelID = " + hotelID + "; ";
+
+            esql.executeUpdate(query);
+            System.out.println("Room successfully updated.");
+
+         }else{
+            System.out.println("Sorry this feature is for managers only.");
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }
+
+   }//end updateRoomInfo
+
    public static void viewRecentUpdates(Hotel esql) 
    {
+      try{
+         String query = "SELECT usertype " +
+                        "FROM Users " +
+                        "WHERE userID = " + authorisedUser + ";"; 
 
+         esql.executeQueryAndPrintResult(query);
 
-   }
-   public static void viewBookingHistoryofHotel(Hotel esql) {}
-   public static void viewRegularCustomers(Hotel esql) {}
-   public static void placeRoomRepairRequests(Hotel esql) {}
-   public static void viewRoomRepairHistory(Hotel esql) {}
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+            boolean man = false;
+            String managerStr = "manager   ";
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(managerStr)) {
+                  man = true;
+                  break;
+               }
+            }
+         
+         if(man){
+            System.out.print("\tEnter hotel ID: ");
+            String hotelID = in.readLine();
 
-}//end Hotel
+            query = "SELECT * " +
+                    "FROM RoomUpdatesLog ru " +
+                    "WHERE hotelID = " + hotelID +
+                     " AND managerID = " + authorisedUser +
+                     " ORDER BY updateNumber DESC " +
+                     "LIMIT 5";
+            List<List<String>> result1 = esql.executeQueryAndReturnResult(query);
+            for (List<String> innerResult : result1){ 
+               System.out.println(innerResult);
+            }
+         }else{
+            System.out.println("Sorry this feature is for managers only.");
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }
+   }//end viewRecentUpdates
+
+   public static void viewBookingHistoryofHotel(Hotel esql) {
+      try{
+         String query = "SELECT usertype " +
+                        "FROM Users " +
+                        "WHERE userID = " + authorisedUser + ";"; 
+
+         esql.executeQueryAndPrintResult(query);
+
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+            boolean man = false;
+            String managerStr = "manager   ";
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(managerStr)) {
+                  man = true;
+                  break;
+               }
+            }
+         
+         if(man){
+            query = "SELECT rb.bookingID, u.name, rb.hotelID, rb.roomNumber, rb.bookingDate " +
+                 "FROM RoomBookings rb, Users u " +
+                 "WHERE rb.hotelID IN (SELECT h.hotelID " +
+                                      "FROM Hotel h " +
+                                      "WHERE managerUserID = " + authorisedUser + ") " +
+                 "AND u.userID = rb.customerID " +
+                 "ORDER BY rb.hotelID";
+            List<List<String>> result1 = esql.executeQueryAndReturnResult(query);
+            for (List<String> innerResult : result1){ 
+               System.out.println(innerResult);
+            }
+         }else{
+            System.out.println("Sorry this feature is for managers only.");
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }
+      
+   }//end viewBookingHistoryOfHotel
+
+   public static void viewRegularCustomers(Hotel esql) 
+   {
+      try{
+         String query = "SELECT usertype " +
+                        "FROM Users " +
+                        "WHERE userID = " + authorisedUser + ";"; 
+
+         esql.executeQueryAndPrintResult(query);
+
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+            boolean man = false;
+            String managerStr = "manager   ";
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(managerStr)) {
+                  man = true;
+                  break;
+               }
+            }
+         
+         if(man){
+            System.out.print("\tEnter hotel ID: ");
+            String hotelID = in.readLine();
+            query = "SELECT rb.customerID, u.name, COUNT(*) AS numOfBookings " +
+                    "FROM RoomBookings rb, Hotel h, Users u " +
+                    "WHERE rb.hotelID = " + hotelID + 
+                    " AND h.hotelID = rb.hotelID " +
+                    "AND h.managerUserID = " + authorisedUser +
+                    " AND u.userID = rb.customerID " +
+                    "GROUP BY rb.customerID, u.userID " +
+                    "ORDER BY numOfBookings DESC " +
+                    "LIMIT 5"; 
+            List<List<String>> result1 = esql.executeQueryAndReturnResult(query);
+            for (List<String> innerResult : result1){ 
+               System.out.println(innerResult);
+            }
+         }else{
+            System.out.println("Sorry this feature is for managers only.");
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }
+      
+   }// end viewRegularCustomers
+
+   public static void placeRoomRepairRequests(Hotel esql) 
+   {
+      try{
+         String query = "SELECT usertype " +
+                        "FROM Users " +
+                        "WHERE userID = " + authorisedUser + ";"; 
+
+         esql.executeQueryAndPrintResult(query);
+
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+            boolean man = false;
+            String managerStr = "manager   ";
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(managerStr)) {
+                  man = true;
+                  break;
+               }
+            }
+         
+         if(man){
+            System.out.print("\tEnter hotel ID: ");
+            String hotelID = in.readLine();
+            System.out.print("\tEnter room number: ");
+            String roomNumber = in.readLine();
+            System.out.print("\tEnter companyID: ");
+            String compID = in.readLine();
+
+            query = "SELECT hotelID " + 
+                    "FROM Hotel " +
+                    "WHERE Hotel.managerUserID = " + authorisedUser + ";";
+
+            esql.executeQueryAndPrintResult(query); //remove
+            result = esql.executeQueryAndReturnResult(query);
+            boolean belongs = false;
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(hotelID)) {
+                  belongs = true;
+                  break;
+               }
+            }
+            
+            if(belongs){
+               query = "INSERT INTO RoomRepairs(companyID, hotelID, roomNumber, repairDate) " + 
+                    "VALUES (" + compID + ", " + hotelID + ", " + roomNumber + ", CURRENT_DATE);";
+               esql.executeUpdate(query);
+
+               query = "INSERT INTO RoomRepairRequests(repairID, managerID)" + 
+                       "SELECT rr.repairID, " + authorisedUser + " " + 
+                       "FROM RoomRepairs rr " + 
+                       "WHERE rr.companyID = " + compID + " " +
+                           "AND rr.hotelID = " + hotelID + " " +
+                           "AND rr.roomNumber = " + roomNumber + ";";
+               esql.executeUpdate(query);
+
+               System.out.println("Request processed.");
+            }else{
+               System.out.println("Sorry you don't manage this hotel.");
+            }
+
+            
+         }else{
+            System.out.println("Sorry this feature is for managers only.");
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }//end placeRoomRepairRequests
+}
+
+   public static void viewRoomRepairHistory(Hotel esql) 
+   {
+      try{
+         String query = "SELECT usertype " +
+                        "FROM Users " +
+                        "WHERE userID = " + authorisedUser + ";"; 
+
+         esql.executeQueryAndPrintResult(query);
+
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+            boolean man = false;
+            String managerStr = "manager   ";
+            for (List<String> innerResult : result){ 
+               //System.out.println("Inner result: " + innerResult);
+               if (innerResult.contains(managerStr)) {
+                  man = true;
+                  break;
+               }
+            }
+         
+         if(man){
+            query = "SELECT r2.companyID, r2.hotelID, r2.roomNumber, r2.repairDate " + 
+                    "FROM RoomRepairs r2, RoomRepairRequests r3 " + 
+                    "WHERE r3.managerID = " + authorisedUser + " " + 
+                          "AND r3.repairID = r2.repairID;";
+            esql.executeQueryAndPrintResult(query);
+
+            int rowCount = esql.executeQuery(query);
+            System.out.println("total row(s): " + rowCount);
+
+         }else{
+            System.out.println("Sorry this feature is for managers only.");
+         }
+      }catch(Exception e){
+         System.err.println(e.getMessage ());
+      }
+   }//end viewRoomRepairHistory
+}//end Hotel*/
+
 

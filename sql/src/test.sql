@@ -75,3 +75,20 @@ WHERE rb.hotelID = 10
 GROUP BY rb.customerID, u.userID
 ORDER BY numOfBookings DESC
 LIMIT 5
+
+
+INSERT INTO RoomRepairs(companyID, hotelID, roomNumber, repairDate)
+VALUES (1, 1, 5, CURRENT_DATE);
+INSERT INTO RoomRepairRequests(repairID, managerID)
+SELECT rr.repairID, 10
+FROM RoomRepairs rr
+WHERE rr.companyID = 1
+      AND rr.hotelID = 1
+      AND rr.roomNumber = 5;
+
+
+SELECT r2.companyID, r2.hotelID, r2.roomNumber, r2.repairDate
+FROM RoomRepairs r2, RoomRepairRequests r3
+WHERE r3.managerID = --userin
+      AND r3.repairID = r2.repairID
+      

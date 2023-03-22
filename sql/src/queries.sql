@@ -77,13 +77,27 @@ WHERE rb.hotelID = --user input
       AND h.hotelID = rb.hotelID
       AND h.managerUserID = --managerid user input
       AND u.userID = rb.customerID
-GROUP BY rb.customerID
+GROUP BY rb.customerID, u.userID
 ORDER BY numOfBookings DESC
 LIMIT 5
 
 --public static void placeRoomRepairRequests(Hotel esql) {}
 -- verify if manager first
+INSERT INTO RoomRepairs(companyID, hotelID, roomNumber, repairDate)
+VALUES (--user inputs, CURRENT_DATE);
 
+INSERT INTO RoomRepairRequests(repairID, managerID)
+SELECT rr.repairID, 123
+FROM RoomRepairs rr
+WHERE rr.companyID = --user input
+      AND rr.hotelID = --user input
+      AND rr.roomNumber = --user input
+
+UPDATE RoomRepairRequests
+SET managerID = --manager id user input
+WHERE rr.companyID = --user input
+      AND rr.hotelID = --user input
+      AND rr.roomNumber = --user input
 
 --public static void viewRoomRepairHistory(Hotel esql) {}
 -- verify if manager first
