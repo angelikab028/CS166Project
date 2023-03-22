@@ -31,12 +31,12 @@ INSERT INTO RoomBookings (customerID, hotelID, roomNumber, bookingDate)
 VALUES --(user inputs);
 
 --public static void viewRecentBookingsfromCustomer(Hotel esql) {}
-SELECT rb.hotelID, rb.roomNumber, r.price
+SELECT rb.hotelID, rb.roomNumber, r.price, rb.bookingDate 
 FROM RoomBookings rb, Rooms r
 WHERE rb.customerID = --customer id (user input)
       AND rb.hotelID = r.hotelID
       AND rb.roomNumber = r.roomNumber
-ORDER BY rb.bookingID DESC
+ORDER BY rb.bookingDate DESC
 LIMIT 5;
 
 --public static void updateRoomInfo(Hotel esql) {}
@@ -47,8 +47,8 @@ SET price = --user input,
 WHERE roomNumber = --user input
       AND hotelID = --user input;
 --store update
-INSERT INTO RoomUpdatesLog (managerID, hotelID, roomNUmber)
-VALUES (--user inputs)
+INSERT INTO RoomUpdatesLog (managerID, hotelID, roomNUmber, updatedOn)
+VALUES (--user inputs, CURRENT_TIMESTAMP);
 
 --public static void viewRecentUpdates(Hotel esql) {}
 -- verify if manager first
@@ -63,19 +63,20 @@ LIMIT 5;
 -- verify if manager first
 SELECT rb.bookingID, u.name, rb.hotelID, rb.roomNumber, rb.bookingDate
 FROM RoomBookings rb, Users u
-WHERE rb.hotelID = (SELECT h.hotelID
+WHERE rb.hotelID IN (SELECT h.hotelID
                  FROM Hotel h
                  WHERE managerUserID = --managerUserID (user input))
-      AND u.userID = rb.customerID;
+      AND u.userID = rb.customerID
+ORDER BY rb.hotelID;
 
 --public static void viewRegularCustomers(Hotel esql) {}
 -- verify if manager first
 SELECT rb.customerID, u.name, COUNT(*) as numOfBookings
-FROM RoomBookings rb, Hotel h, User u
+FROM RoomBookings rb, Hotel h, Users u
 WHERE rb.hotelID = --user input
       AND h.hotelID = rb.hotelID
       AND h.managerUserID = --managerid user input
-      AND u.userID = customerID
+      AND u.userID = rb.customerID
 GROUP BY rb.customerID
 ORDER BY numOfBookings DESC
 LIMIT 5
