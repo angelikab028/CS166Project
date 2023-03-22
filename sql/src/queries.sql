@@ -17,7 +17,7 @@ WHERE NOT EXISTS(SELECT *
 
 --public static void bookRooms(Hotel esql) {}
 -- use execute and return func to return the previous query 
--- into the list o list then do result.get(0).contains(roomNum) if
+-- into the list o list then do if(result.get(0).contains(roomNum))
 -- true then say invalid and if false continue
 SELECT rb.roomNumber
 FROM RoomBookings rb
@@ -29,7 +29,13 @@ INSERT INTO RoomBookings (customerID, hotelID, roomNumber, bookingDate)
 VALUES --(user inputs);
 
 --public static void viewRecentBookingsfromCustomer(Hotel esql) {}
-
+SELECT rb.hotelID, rb.roomNumber, r.price
+FROM RoomBookings rb, Rooms r
+WHERE rb.customerID = --customer id (user input)
+      AND rb.hotelID = r.hotelID
+      AND rb.roomNumber = r.roomNumber
+ORDER BY rb.bookingID DESC
+LIMIT 5
 
 --public static void updateRoomInfo(Hotel esql) {}
 
