@@ -41,6 +41,14 @@ LIMIT 5;
 
 --public static void updateRoomInfo(Hotel esql) {}
 -- verify if manager first 
+UPDATE Rooms
+SET price = --user input,
+    imageURL = --user input
+WHERE roomNumber = --user input
+      AND hotelID = --user input;
+--store update
+INSERT INTO RoomUpdatesLog (managerID, hotelID, roomNUmber)
+VALUES (--user inputs)
 
 --public static void viewRecentUpdates(Hotel esql) {}
 -- verify if manager first
@@ -74,6 +82,7 @@ LIMIT 5
 
 --public static void placeRoomRepairRequests(Hotel esql) {}
 -- verify if manager first
+
 
 --public static void viewRoomRepairHistory(Hotel esql) {}
 -- verify if manager first

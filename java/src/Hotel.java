@@ -389,6 +389,14 @@ public class Hotel {
 
          String query = String.format("SELECT * FROM USERS WHERE userID = '%s' AND password = '%s'", userID, password);
          int userNum = esql.executeQuery(query);
+
+         /* --------------------------------------------------------
+            here we need to implement a global bool that reflects if
+            the user is a manger or not
+            
+            use the execute and return then .contains('manager') 
+            -------------------------------------------------------- */
+
          if (userNum > 0)
             return userID;
          return null;
