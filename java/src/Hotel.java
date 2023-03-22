@@ -559,8 +559,12 @@ public class Hotel {
                       "imageURL = \'" + imageUpdate + "\' " + 
                   "WHERE roomNumber = " + roomNumber + " " + 
                         "AND hotelID = " + hotelID + "; ";
-
             esql.executeUpdate(query);
+
+            query = "INSERT INTO RoomUpdatesLog (managerID, hotelID, roomNUmber, updatedOn) " +
+                    "VALUES (" + authorisedUser + ", " + hotelID + ", " + roomNumber + ", CURRENT_TIMESTAMP);";
+            esql.executeUpdate(query);
+
             System.out.println("Room successfully updated.");
 
          }else{
@@ -723,7 +727,6 @@ public class Hotel {
                     "FROM Hotel " +
                     "WHERE Hotel.managerUserID = " + authorisedUser + ";";
 
-            esql.executeQueryAndPrintResult(query); //remove
             result = esql.executeQueryAndReturnResult(query);
             boolean belongs = false;
             for (List<String> innerResult : result){ 
