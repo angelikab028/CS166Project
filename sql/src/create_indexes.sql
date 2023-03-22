@@ -4,10 +4,7 @@ DROP INDEX IF EXISTS hotelID_index CASCADE;
 DROP INDEX IF EXISTS bookingDate_index CASCADE;
 DROP INDEX IF EXISTS roomNumber_index CASCADE;
 DROP INDEX IF EXISTS customerID_index CASCADE;
-DROP INDEX IF EXISTS imageURL_index CASCADE;
-DROP INDEX IF EXISTS price_index CASCADE;
 DROP INDEX IF EXISTS managerID_index CASCADE;
-DROP INDEX IF EXISTS updatedOn_index CASCADE;
 DROP INDEX IF EXISTS userID_index CASCADE;
 DROP INDEX IF EXISTS companyID_index CASCADE;
 DROP INDEX IF EXISTS repairID_index CASCADE;
@@ -42,25 +39,10 @@ ON RoomBookings
 USING BTREE
 (customerID);
 
-CREATE INDEX imageURL_index
-ON Rooms
-USING BTREE
-(imageURL);
-
-CREATE INDEX price_index
-ON Rooms
-USING BTREE
-(price);
-
 CREATE INDEX managerID_index
 ON RoomRepairRequests
 USING BTREE
 (managerID);
-
-CREATE INDEX updatedOn_index
-ON RoomUpdatesLog
-USING BTREE
-(updatedOn);
 
 CREATE INDEX userID_index
 ON Users
